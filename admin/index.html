@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sace.io Admin Dashboard</title>
+    <link rel="stylesheet" href="styles/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Admin Login</h3>
+            </div>
+            <div class="modal-body">
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="adminEmail">Email</label>
+                        <input type="email" id="adminEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminPassword">Password</label>
+                        <input type="password" id="adminPassword" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Login</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div class="dashboard" id="dashboard" style="display: none;">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2>Sace.io Admin</h2>
+                <span class="version">v1.0.0</span>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="menu-item active" data-section="overview">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Overview</span>
+                </li>
+                <li class="menu-item" data-section="users">
+                    <i class="fas fa-users"></i>
+                    <span>Users</span>
+                </li>
+                <li class="menu-item" data-section="avatars">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Avatars</span>
+                </li>
+                <li class="menu-item" data-section="feedback">
+                    <i class="fas fa-comments"></i>
+                    <span>Feedback</span>
+                </li>
+                <li class="menu-item" data-section="audit-logs">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>Audit Logs</span>
+                </li>
+                <li class="menu-item" data-section="ai-training">
+                    <i class="fas fa-brain"></i>
+                    <span>AI Training</span>
+                </li>
+                <li class="menu-item" data-section="model-evaluation">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Model Evaluation</span>
+                </li>
+                <li class="menu-item" data-section="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <button class="btn-secondary" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <h1 id="pageTitle">Dashboard Overview</h1>
+                </div>
+                <div class="header-right">
+                    <div class="user-info">
+                        <span id="adminName">Admin User</span>
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Sections -->
+            <div class="content">
+                <!-- Overview Section -->
+                <section class="content-section active" id="overview">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="totalUsers">0</h3>
+                                <p>Total Users</p>
+                                <span class="stat-change positive" id="userChange">+0%</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="totalAvatars">0</h3>
+                                <p>Total Avatars</p>
+                                <span class="stat-change positive" id="avatarChange">+0%</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="totalFeedback">0</h3>
+                                <p>Total Feedback</p>
+                                <span class="stat-change positive" id="feedbackChange">+0%</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="averageRating">0.0</h3>
+                                <p>Average Rating</p>
+                                <span class="stat-change positive" id="ratingChange">+0%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <h3>User Growth</h3>
+                            <canvas id="userGrowthChart"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Avatar Generation</h3>
+                            <canvas id="avatarGenerationChart"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Feedback Distribution</h3>
+                            <canvas id="feedbackDistributionChart"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <h3>System Performance</h3>
+                            <canvas id="systemPerformanceChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="recent-activity">
+                        <h3>Recent Activity</h3>
+                        <div class="activity-list" id="recentActivity">
+                            <!-- Activity items will be populated here -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Users Section -->
+                <section class="content-section" id="users">
+                    <div class="section-header">
+                        <h2>User Management</h2>
+                        <div class="section-actions">
+                            <input type="text" id="userSearch" placeholder="Search users...">
+                            <select id="userFilter">
+                                <option value="">All Users</option>
+                                <option value="verified">Verified</option>
+                                <option value="unverified">Unverified</option>
+                            </select>
+                            <button class="btn-primary" id="exportUsers">Export</button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="usersTable">
+                            <thead>
+                                <tr>
+                                    <th>Email</th>
+                                    <th>Name</th>
+                                    <th>Status</th>
+                                    <th>Avatars</th>
+                                    <th>Downloads</th>
+                                    <th>Last Activity</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <!-- User rows will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination" id="usersPagination">
+                        <!-- Pagination will be populated here -->
+                    </div>
+                </section>
+
+                <!-- Avatars Section -->
+                <section class="content-section" id="avatars">
+                    <div class="section-header">
+                        <h2>Avatar Management</h2>
+                        <div class="section-actions">
+                            <input type="text" id="avatarSearch" placeholder="Search avatars...">
+                            <select id="avatarFilter">
+                                <option value="">All Avatars</option>
+                                <option value="completed">Completed</option>
+                                <option value="processing">Processing</option>
+                                <option value="failed">Failed</option>
+                            </select>
+                            <button class="btn-primary" id="exportAvatars">Export</button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="avatarsTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>User</th>
+                                    <th>Method</th>
+                                    <th>Status</th>
+                                    <th>Downloads</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="avatarsTableBody">
+                                <!-- Avatar rows will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination" id="avatarsPagination">
+                        <!-- Pagination will be populated here -->
+                    </div>
+                </section>
+
+                <!-- Feedback Section -->
+                <section class="content-section" id="feedback">
+                    <div class="section-header">
+                        <h2>Feedback Management</h2>
+                        <div class="section-actions">
+                            <input type="text" id="feedbackSearch" placeholder="Search feedback...">
+                            <select id="feedbackFilter">
+                                <option value="">All Ratings</option>
+                                <option value="5">5 Stars</option>
+                                <option value="4">4 Stars</option>
+                                <option value="3">3 Stars</option>
+                                <option value="2">2 Stars</option>
+                                <option value="1">1 Star</option>
+                            </select>
+                            <button class="btn-primary" id="exportFeedback">Export</button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="feedbackTable">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Avatar ID</th>
+                                    <th>Rating</th>
+                                    <th>Review</th>
+                                    <th>Category</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="feedbackTableBody">
+                                <!-- Feedback rows will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination" id="feedbackPagination">
+                        <!-- Pagination will be populated here -->
+                    </div>
+                </section>
+
+                <!-- Audit Logs Section -->
+                <section class="content-section" id="audit-logs">
+                    <div class="section-header">
+                        <h2>Audit Logs</h2>
+                        <div class="section-actions">
+                            <input type="text" id="auditSearch" placeholder="Search logs...">
+                            <select id="auditFilter">
+                                <option value="">All Types</option>
+                                <option value="user_registration">User Registration</option>
+                                <option value="avatar_generated">Avatar Generated</option>
+                                <option value="avatar_downloaded">Avatar Downloaded</option>
+                                <option value="feedback_submitted">Feedback Submitted</option>
+                                <option value="security_event">Security Event</option>
+                            </select>
+                            <input type="date" id="auditStartDate">
+                            <input type="date" id="auditEndDate">
+                            <button class="btn-primary" id="exportAuditLogs">Export</button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="auditTable">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>User</th>
+                                    <th>IP Address</th>
+                                    <th>Severity</th>
+                                    <th>Timestamp</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="auditTableBody">
+                                <!-- Audit log rows will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination" id="auditPagination">
+                        <!-- Pagination will be populated here -->
+                    </div>
+                </section>
+
+                <!-- AI Training Section -->
+                <section class="content-section" id="ai-training">
+                    <div class="section-header">
+                        <h2>AI Model Training</h2>
+                        <div class="section-actions">
+                            <button class="btn-primary" id="initializeTraining">Initialize</button>
+                            <button class="btn-secondary" id="prepareData">Prepare Data</button>
+                            <button class="btn-success" id="startTraining">Start Training</button>
+                        </div>
+                    </div>
+                    <div class="training-status">
+                        <div class="status-card">
+                            <h3>Training Status</h3>
+                            <div class="status-indicator" id="trainingStatus">
+                                <span class="status-dot"></span>
+                                <span class="status-text">Not Started</span>
+                            </div>
+                        </div>
+                        <div class="status-card">
+                            <h3>Training Progress</h3>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="trainingProgress"></div>
+                            </div>
+                            <span id="trainingProgressText">0%</span>
+                        </div>
+                    </div>
+                    <div class="training-logs">
+                        <h3>Training Logs</h3>
+                        <div class="log-container" id="trainingLogs">
+                            <!-- Training logs will be populated here -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Model Evaluation Section -->
+                <section class="content-section" id="model-evaluation">
+                    <div class="section-header">
+                        <h2>Model Evaluation</h2>
+                        <div class="section-actions">
+                            <button class="btn-primary" id="loadModel">Load Model</button>
+                            <button class="btn-secondary" id="loadDataset">Load Dataset</button>
+                            <button class="btn-success" id="startEvaluation">Start Evaluation</button>
+                            <button class="btn-info" id="crossValidate">Cross Validation</button>
+                        </div>
+                    </div>
+                    <div class="evaluation-results">
+                        <div class="metrics-grid">
+                            <div class="metric-card">
+                                <h3>Accuracy</h3>
+                                <div class="metric-value" id="accuracyValue">0.00</div>
+                            </div>
+                            <div class="metric-card">
+                                <h3>Precision</h3>
+                                <div class="metric-value" id="precisionValue">0.00</div>
+                            </div>
+                            <div class="metric-card">
+                                <h3>Recall</h3>
+                                <div class="metric-value" id="recallValue">0.00</div>
+                            </div>
+                            <div class="metric-card">
+                                <h3>F1 Score</h3>
+                                <div class="metric-value" id="f1ScoreValue">0.00</div>
+                            </div>
+                        </div>
+                        <div class="evaluation-charts">
+                            <div class="chart-card">
+                                <h3>Confusion Matrix</h3>
+                                <canvas id="confusionMatrixChart"></canvas>
+                            </div>
+                            <div class="chart-card">
+                                <h3>ROC Curve</h3>
+                                <canvas id="rocCurveChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Settings Section -->
+                <section class="content-section" id="settings">
+                    <div class="section-header">
+                        <h2>System Settings</h2>
+                    </div>
+                    <div class="settings-grid">
+                        <div class="settings-card">
+                            <h3>Database Settings</h3>
+                            <div class="setting-item">
+                                <label>Auto Cleanup</label>
+                                <input type="checkbox" id="autoCleanup" checked>
+                            </div>
+                            <div class="setting-item">
+                                <label>Data Retention (days)</label>
+                                <input type="number" id="dataRetention" value="90">
+                            </div>
+                        </div>
+                        <div class="settings-card">
+                            <h3>AI Training Settings</h3>
+                            <div class="setting-item">
+                                <label>Auto Training</label>
+                                <input type="checkbox" id="autoTraining">
+                            </div>
+                            <div class="setting-item">
+                                <label>Training Frequency (hours)</label>
+                                <input type="number" id="trainingFrequency" value="24">
+                            </div>
+                        </div>
+                        <div class="settings-card">
+                            <h3>Security Settings</h3>
+                            <div class="setting-item">
+                                <label>Rate Limiting</label>
+                                <input type="checkbox" id="rateLimiting" checked>
+                            </div>
+                            <div class="setting-item">
+                                <label>Audit Logging</label>
+                                <input type="checkbox" id="auditLogging" checked>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="settings-actions">
+                        <button class="btn-primary" id="saveSettings">Save Settings</button>
+                        <button class="btn-secondary" id="resetSettings">Reset to Default</button>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/admin-utils.js"></script>
+    <script src="js/admin-auth.js"></script>
+    <script src="js/admin-dashboard.js"></script>
+    <script src="js/admin-users.js"></script>
+    <script src="js/admin-avatars.js"></script>
+    <script src="js/admin-feedback.js"></script>
+    <script src="js/admin-audit.js"></script>
+    <script src="js/admin-training.js"></script>
+    <script src="js/admin-evaluation.js"></script>
+    <script src="js/admin-main.js"></script>
+</body>
+</html>

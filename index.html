@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sace.io - AI Avatar Creator</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/animations.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1>Sace.io</h1>
+                <span class="tagline">AI Avatar Creator</span>
+            </div>
+            <div class="nav-actions">
+                <button id="loginBtn" class="btn-secondary">Login</button>
+                <button id="dashboardBtn" class="btn-primary" style="display: none;">Dashboard</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h2>Create Your Perfect 3D Avatar</h2>
+                <p>Transform yourself, friends, or pets into personalized cartoon-style 3D avatars using AI</p>
+                <div class="hero-features">
+                    <div class="feature">
+                        <i class="fas fa-camera"></i>
+                        <span>Live Scanning</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-upload"></i>
+                        <span>Image Upload</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-paw"></i>
+                        <span>Pet Friendly</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mode Selection -->
+        <section class="mode-selection">
+            <div class="container">
+                <h3>Choose Your Creation Method</h3>
+                <div class="mode-cards">
+                    <div class="mode-card" id="liveScanCard">
+                        <div class="mode-icon">
+                            <i class="fas fa-video"></i>
+                        </div>
+                        <h4>Live Scanning</h4>
+                        <p>Use your webcam to scan faces in real-time with instant feedback</p>
+                        <button class="btn-primary" id="startLiveScan">Start Live Scan</button>
+                    </div>
+                    <div class="mode-card" id="uploadCard">
+                        <div class="mode-icon">
+                            <i class="fas fa-images"></i>
+                        </div>
+                        <h4>Image Upload</h4>
+                        <p>Upload 3-4 clear images (front, left, right, back) for precise avatar creation</p>
+                        <button class="btn-primary" id="startUpload">Upload Images</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Live Scanning Interface -->
+        <section class="scanning-interface" id="scanningInterface" style="display: none;">
+            <div class="container">
+                <div class="scanning-header">
+                    <h3>Live Face Scanning</h3>
+                    <button class="btn-secondary" id="stopScan">Stop Scanning</button>
+                </div>
+                <div class="scanning-content">
+                    <div class="camera-container">
+                        <video id="cameraFeed" autoplay muted></video>
+                        <canvas id="scanningCanvas"></canvas>
+                        <div class="scanning-overlay">
+                            <div class="scan-zone" id="scanZone">
+                                <div class="scan-indicator"></div>
+                                <p>Position face in the frame</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="scanning-controls">
+                        <div class="scan-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="scanProgress"></div>
+                            </div>
+                            <span id="scanStatus">Ready to scan</span>
+                        </div>
+                        <div class="detected-faces" id="detectedFaces">
+                            <!-- Detected faces will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Image Upload Interface -->
+        <section class="upload-interface" id="uploadInterface" style="display: none;">
+            <div class="container">
+                <div class="upload-header">
+                    <h3>Image Upload</h3>
+                    <button class="btn-secondary" id="backToModes">Back to Modes</button>
+                </div>
+                <div class="upload-content">
+                    <div class="upload-instructions">
+                        <h4>Upload Requirements</h4>
+                        <ul>
+                            <li><strong>Front View:</strong> Clear forward-facing face</li>
+                            <li><strong>Left Profile:</strong> Side view from the left</li>
+                            <li><strong>Right Profile:</strong> Side view from the right</li>
+                            <li><strong>Back View:</strong> Optional rear view</li>
+                        </ul>
+                    </div>
+                    <div class="upload-zones">
+                        <div class="upload-zone" data-angle="front">
+                            <div class="upload-placeholder">
+                                <i class="fas fa-user"></i>
+                                <span>Front View</span>
+                            </div>
+                            <input type="file" accept="image/*" class="upload-input" data-angle="front">
+                            <div class="upload-preview"></div>
+                            <div class="upload-status"></div>
+                        </div>
+                        <div class="upload-zone" data-angle="left">
+                            <div class="upload-placeholder">
+                                <i class="fas fa-user"></i>
+                                <span>Left Profile</span>
+                            </div>
+                            <input type="file" accept="image/*" class="upload-input" data-angle="left">
+                            <div class="upload-preview"></div>
+                            <div class="upload-status"></div>
+                        </div>
+                        <div class="upload-zone" data-angle="right">
+                            <div class="upload-placeholder">
+                                <i class="fas fa-user"></i>
+                                <span>Right Profile</span>
+                            </div>
+                            <input type="file" accept="image/*" class="upload-input" data-angle="right">
+                            <div class="upload-preview"></div>
+                            <div class="upload-status"></div>
+                        </div>
+                        <div class="upload-zone" data-angle="back">
+                            <div class="upload-placeholder">
+                                <i class="fas fa-user"></i>
+                                <span>Back View (Optional)</span>
+                            </div>
+                            <input type="file" accept="image/*" class="upload-input" data-angle="back">
+                            <div class="upload-preview"></div>
+                            <div class="upload-status"></div>
+                        </div>
+                    </div>
+                    <div class="upload-actions">
+                        <button class="btn-primary" id="processImages" disabled>Process Images</button>
+                        <div class="upload-error" id="uploadError"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Avatar Generation -->
+        <section class="generation-interface" id="generationInterface" style="display: none;">
+            <div class="container">
+                <div class="generation-header">
+                    <h3>Generating Your Avatar</h3>
+                    <div class="generation-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="generationProgress"></div>
+                        </div>
+                        <span id="generationStatus">Analyzing features...</span>
+                    </div>
+                </div>
+                <div class="generation-content">
+                    <div class="avatar-preview" id="avatarPreview">
+                        <!-- 3D avatar will be rendered here -->
+                    </div>
+                    <div class="generation-details">
+                        <h4>Detected Features</h4>
+                        <div class="feature-list" id="featureList">
+                            <!-- Detected features will be listed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Avatar Result -->
+        <section class="avatar-result" id="avatarResult" style="display: none;">
+            <div class="container">
+                <div class="result-header">
+                    <h3>Your Avatar is Ready!</h3>
+                    <div class="avatar-controls">
+                        <button class="btn-secondary" id="rotateAvatar">
+                            <i class="fas fa-sync-alt"></i> Rotate
+                        </button>
+                        <button class="btn-secondary" id="zoomAvatar">
+                            <i class="fas fa-search-plus"></i> Zoom
+                        </button>
+                    </div>
+                </div>
+                <div class="result-content">
+                    <div class="avatar-display" id="avatarDisplay">
+                        <!-- Final 3D avatar display -->
+                    </div>
+                    <div class="result-actions">
+                        <button class="btn-primary" id="downloadAvatar">Download Avatar</button>
+                        <button class="btn-secondary" id="createAnother">Create Another</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Email Verification Modal -->
+        <div class="modal" id="emailModal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Email Verification Required</h3>
+                    <button class="modal-close" id="closeEmailModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>To download your avatar, please verify your email address:</p>
+                    <form id="emailForm">
+                        <div class="form-group">
+                            <label for="userEmail">Email Address</label>
+                            <input type="email" id="userEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="userName">Full Name</label>
+                            <input type="text" id="userName" required>
+                        </div>
+                        <button type="submit" class="btn-primary">Send Verification Code</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Verification Code Modal -->
+        <div class="modal" id="codeModal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Enter Verification Code</h3>
+                    <button class="modal-close" id="closeCodeModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>We've sent a verification code to your email. Please enter it below:</p>
+                    <form id="codeForm">
+                        <div class="form-group">
+                            <label for="verificationCode">Verification Code</label>
+                            <input type="text" id="verificationCode" maxlength="6" required>
+                        </div>
+                        <button type="submit" class="btn-primary">Verify & Download</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback Modal -->
+        <div class="modal" id="feedbackModal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Rate Your Avatar</h3>
+                    <button class="modal-close" id="closeFeedbackModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="rating-section">
+                        <h4>How satisfied are you with your avatar?</h4>
+                        <div class="rating-options">
+                            <button class="rating-btn" data-rating="1">😠<span>Very Unsatisfied</span></button>
+                            <button class="rating-btn" data-rating="2">😕<span>Unsatisfied</span></button>
+                            <button class="rating-btn" data-rating="3">😐<span>Neutral</span></button>
+                            <button class="rating-btn" data-rating="4">🙂<span>Satisfied</span></button>
+                            <button class="rating-btn" data-rating="5">😍<span>Very Satisfied</span></button>
+                        </div>
+                    </div>
+                    <div class="review-section">
+                        <h4>Optional Review</h4>
+                        <textarea id="reviewText" placeholder="Share your thoughts about the avatar generation process..."></textarea>
+                    </div>
+                    <button class="btn-primary" id="submitFeedback">Submit Feedback</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h4>Sace.io</h4>
+                    <p>AI-powered avatar creation</p>
+                </div>
+                <div class="footer-links">
+                    <a href="#privacy">Privacy Policy</a>
+                    <a href="#terms">Terms of Service</a>
+                    <a href="#contact">Contact</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/GLTFExporter.js"></script>
+    
+    <!-- TensorFlow.js and MediaPipe -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection@2.0.1/dist/face-landmarks-detection.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface@0.0.7/dist/blazeface.min.js"></script>
+    
+    <!-- Core Scripts -->
+    <script src="js/utils.js"></script>
+    <script src="js/camera.js"></script>
+    <script src="js/face-detection.js"></script>
+    <script src="js/image-processing.js"></script>
+    
+    <!-- Real AI Components -->
+    <script src="js/face-mesh-detector.js"></script>
+    <script src="js/3d-mesh-generator.js"></script>
+    <script src="js/clothing-detector.js"></script>
+    <script src="js/glb-exporter.js"></script>
+    
+    <!-- Avatar Generator -->
+    <script src="js/avatar-generator.js"></script>
+    <script src="js/email-verification.js"></script>
+    <script src="js/user-dashboard.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
